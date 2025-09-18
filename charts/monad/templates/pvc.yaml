@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{include "monad.fullname" .}}-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1.7Ti
+  storageClassName: nvme
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{include "monad.fullname" .}}-triedb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1.7Ti
+  storageClassName: block
+  volumeMode: Block

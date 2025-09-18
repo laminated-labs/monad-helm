@@ -1,0 +1,376 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "monad.fullname" . }}
+  labels:
+    {{- include "monad.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "monad.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "monad.fullname" . }}
+  template:
+    metadata:
+      annotations:
+        checksum/config-scripts: {{ include (print $.Template.BasePath "/configmap-scripts.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "monad.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if eq .Values.imagePullSecrets.enable true }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets.name }}
+      {{- end }}
+      serviceAccountName: {{ include "monad.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        # Enable necessary sysctl settings
+        - name: sysctl
+          image: ubuntu
+          securityContext:
+            privileged: true
+          command:
+            - bash
+            - -c
+            - |
+              set -euo pipefail
+              sysctl -w net.core.rmem_default=62500000
+              sysctl -w net.core.rmem_max=62500000
+              sysctl -w net.core.wmem_default=62500000
+              sysctl -w net.core.wmem_max=62500000
+              sysctl -w net.ipv4.tcp_rmem="4096 62500000 62500000"
+              sysctl -w net.ipv4.tcp_wmem="4096 62500000 62500000"
+        # Initialize the triedb device. If certain files are present, additional tasks are performed.
+        #  - HARD_RESET_SENTINEL_FILE: If this file is present, a hard reset of the triedb is performed.
+        #  - SOFT_RESET_SENTINEL_FILE: If this file is present, a soft reset of the triedb is performed.
+        - name: initialize-triedb
+          image: {{ .Values.execution.image.name | default "categoryxyz/monad-execution" }}:{{ .Values.mpt.image.tag | default .Chart.AppVersion }}
+          securityContext:
+            privileged: true
+          command:
+            - /tmp/scripts/init.sh
+          resources:
+            limits:
+              hugepages-2Mi: 2048Mi
+              hugepages-1Gi: 4Gi
+            requests:
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /hugepages-2Mi
+              name: hugepage-2mi
+            - mountPath: /hugepages-1Gi
+              name: hugepage-1gi
+            - mountPath: /monad
+              name: monad-data
+            - mountPath: /tmp/scripts
+              name: monad-scripts
+          volumeDevices:
+            - devicePath: /dev/triedb
+              name: monad-triedb
+        # Downloads the most recent forkpoint. Will run if no forkpoint.toml exists
+        # or if the sentinel file `SOFT_RESET_SENTINEL_FILE` exists.
+        # NOTE: We use the debian container because the script requires proper
+        # timezone configuration, which is not available in the ubuntu container.
+        - name: download-forkpoint
+          image: debian
+          command:
+            - /tmp/scripts/download-forkpoint.sh
+          volumeMounts:
+            - mountPath: /monad
+              name: monad-data
+            - mountPath: /tmp/scripts
+              name: monad-scripts
+        # Periodically clears old artifacts to prevent disk space issues
+        - name: clear-old-artifacts
+          image: ubuntu
+          command:
+            - bash
+            - -c
+            - |
+              while true
+              do
+                /tmp/scripts/clear-old-artifacts.sh
+                sleep 600
+              done
+          restartPolicy: Always
+          volumeMounts:
+            - mountPath: /monad
+              name: monad-data
+            - mountPath: /tmp/scripts
+              name: monad-scripts
+        {{- if eq .Values.monitoring.enabled true }}
+        - name: monitoring
+          image: otel/opentelemetry-collector-contrib:latest
+          imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          args:
+            - --config=/mount/otel-collector-config.yaml
+          ports:
+            - containerPort: 8889
+              protocol: TCP
+              name: metrics
+            - containerPort: 8888
+              protocol: TCP
+              name: otel-metrics
+            - containerPort: 4317
+              protocol: TCP
+              name: otel-grpc
+          volumeMounts:
+            - mountPath: /mount
+              name: monad-configs
+        {{- end}}
+        {{- with .Values.extraInitContainers}}
+          {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: bft
+          image: {{ .Values.isFullNode | ternary .Values.full.image.name .Values.bft.image.name }}:{{  .Values.bft.image.tag | default .Chart.AppVersion }}
+          securityContext:
+            privileged: true
+          command:
+            - {{ .Values.isFullNode | ternary "monad-full-node" "monad-node" }}
+          args:
+            - --secp-identity
+            - /monad/keys/id-secp
+            - --bls-identity
+            - /monad/keys/id-bls
+            - --node-config
+            - /monad/config/node.toml
+            - --forkpoint-config
+            - /monad/forkpoint/forkpoint.toml
+            - --wal-path
+            - /monad/wal
+            - --mempool-ipc-path
+            - /monad/mempool.sock
+            - --control-panel-ipc-path
+            - /monad/controlpanel.sock
+            - --statesync-ipc-path
+            - /monad/statesync.sock
+            - --ledger-path
+            - /monad/ledger
+            - --triedb-path
+            - /dev/triedb
+            - --otel-endpoint
+            - $(OTEL_ENDPOINT)
+            - --keystore-password
+            - $(KEYSTORE_PASSWORD)
+            - --record-metrics-interval-seconds
+            - "1"
+            - --validators-path
+            - /monad/config/validators.toml
+          env:
+            - name: RUST_LOG
+              value: debug,h2=warn,tower=warn,monad_statesync=trace
+            - name: OTEL_ENDPOINT
+              value: {{ .Values.otel.endpoint }}
+            - name: KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: KEYSTORE_PASSWORD
+          ports:
+            - containerPort: 8000
+              hostPort: 8000
+              protocol: UDP
+              name: bft-udp
+            - containerPort: 8000
+              hostPort: 8000
+              protocol: TCP
+              name: bft-tcp
+          {{- with .Values.bft.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.bft.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.bft.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            limits:
+              hugepages-2Mi: 2048Mi
+              hugepages-1Gi: 4Gi
+            requests:
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /hugepages-2Mi
+              name: hugepage-2mi
+            - mountPath: /hugepages-1Gi
+              name: hugepage-1gi
+            - mountPath: /monad
+              name: monad-data
+            - mountPath: /monad/config
+              name: monad-configs
+            - mountPath: /monad/keys
+              name: {{ .Values.secret.name }}
+              readOnly: true
+          volumeDevices:
+            - devicePath: /dev/triedb
+              name: monad-triedb
+        - name: rpc
+          image: {{ .Values.rpc.image.name | default "categoryxyz/monad-rpc" }}:{{ .Values.rpc.image.tag | default .Chart.AppVersion }}
+          command:
+            - monad-rpc
+          args:
+            - --ipc-path
+            - /monad/mempool.sock
+            - --triedb-path
+            - /dev/triedb
+            - --otel-endpoint
+            - $(OTEL_ENDPOINT)
+            - --allow-unprotected-txs
+            - --node-config
+            - /monad/config/node.toml
+          env:
+            - name: RUST_LOG
+              value: info
+            - name: monad_ipc
+              value: debug
+            - name: OTEL_ENDPOINT
+              value: {{ .Values.otel.endpoint }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: rpc
+          {{- with .Values.rpc.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.rpc.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.rpc.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            limits:
+              hugepages-2Mi: 2048Mi
+              hugepages-1Gi: 4Gi
+            requests:
+              memory: 1Gi
+          volumeDevices:
+            - devicePath: /dev/triedb
+              name: monad-triedb
+          volumeMounts:
+            - mountPath: /hugepages-2Mi
+              name: hugepage-2mi
+            - mountPath: /hugepages-1Gi
+              name: hugepage-1gi
+            - mountPath: /monad
+              name: monad-data
+            - mountPath: /monad/config
+              name: monad-configs
+            {{- with .Values.extraVolumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+        - name: execution
+          securityContext:
+            privileged: true
+          image: {{ .Values.execution.image.name | default "categoryxyz/monad-execution" }}:{{ .Values.execution.image.tag | default .Chart.AppVersion }}
+          command:
+            - monad
+          args:
+            - --chain
+            - monad_testnet
+            - --db
+            - /dev/triedb
+            - --block_db
+            - /monad/ledger
+            - --statesync
+            - /monad/statesync.sock
+            - --ro_sq_thread_cpu
+            - "1"
+            - --sq_thread_cpu
+            - "2"
+            - --log_level
+            - INFO
+          {{- with .Values.execution.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.execution.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.execution.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            limits:
+              hugepages-2Mi: 2048Mi
+              hugepages-1Gi: 4Gi
+            requests:
+              memory: 1Gi
+          volumeDevices:
+            - devicePath: /dev/triedb
+              name: monad-triedb
+          volumeMounts:
+            - mountPath: /hugepages-2Mi
+              name: hugepage-2mi
+            - mountPath: /hugepages-1Gi
+              name: hugepage-1gi
+            - mountPath: /monad
+              name: monad-data
+            {{- with .Values.extraVolumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+      restartPolicy: Always
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      volumes:
+        - name: hugepage-2mi
+          emptyDir:
+            medium: HugePages-2Mi
+        - name: hugepage-1gi
+          emptyDir:
+            medium: HugePages-1Gi
+        - name: {{ .Values.secret.name }}
+          secret:
+            secretName: {{ .Values.secret.name }}
+        - name: monad-triedb
+          persistentVolumeClaim:
+            claimName: {{include "monad.fullname" .}}-triedb
+        - name: monad-data
+          persistentVolumeClaim:
+            claimName: {{include "monad.fullname" .}}-data
+        - name: monad-scripts
+          configMap:
+            name: {{include "monad.fullname" .}}-scripts
+            defaultMode: 0777
+        - name: monad-configs
+          configMap:
+            name: {{include "monad.fullname" .}}-configs
+        {{- with .Values.extraVolumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,6 @@
+Add necessary configuration files for Monad here. This includes:
+- `genesis.json` – the genesis block for the network.
+- `node.toml` - node configuration
+- `node-map.csv` - list of known peers.
+- `validators.toml` - validator set.
+- `otel-collector-config.yaml` - otel configuration

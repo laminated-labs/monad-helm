@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{include "monad.fullname" .}}
+  labels: {{- include "monad.labels" . | nindent 4}}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.service.hostname }}
+    external-dns.alpha.kubernetes.io/endpoints-type: HostIP
+spec:
+  clusterIP: None
+  ports:
+    - port: 8000
+      targetPort: bft-tcp
+      protocol: TCP
+      name: bft-tcp
+    - port: 8000
+      targetPort: bft-udp
+      protocol: UDP
+      name: bft-udp
+    - port: 8889
+      name: otel
+      targetPort: otel
+  selector: {{- include "monad.selectorLabels" . | nindent 4}}
