@@ -6,7 +6,7 @@ Deploy Monad validator or full nodes on Kubernetes using the Helm chart containe
 - `charts/monad/Chart.yaml` – chart metadata (version `1.0.0`, app version `v0.10.4`).
 - `charts/monad/values.yaml` – default values for replica count, images, node configuration, and monitoring.
 - `charts/monad/templates/` – Kubernetes manifests for the StatefulSet, Services, Secrets, PVCs, and optional monitoring resources.
-- `charts/monad/configs/` – config files packaged into a ConfigMap (genesis data, validator set, OpenTelemetry collector config, node map, and sample `node.toml`).
+- `charts/monad/configs/` – config files packaged into a ConfigMap (genesis data, validator set, OpenTelemetry collector config, node map, and sample `node.toml`, files need to be sourced from Monad validator documentation).
 - `charts/monad/scripts/` – operational scripts mounted into the pod to reset storage, download forkpoints, and prune old artifacts.
 
 ## Prerequisites
@@ -78,4 +78,4 @@ When `monitoring.enabled: true` the chart:
 - Update `version` and `appVersion` in `Chart.yaml` when you publish changes.
 
 ## License
-This project is released under the [MIT License](LICENSE.txt).
+This project is released under the [Apache License 2.0](LICENSE).
