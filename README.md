@@ -16,6 +16,9 @@ Deploy Monad validator or full nodes on Kubernetes using the Helm chart containe
 - Worker nodes configured with huge pages (`HugePages-2Mi` and `HugePages-1Gi`) to satisfy the pod limits configured in the StatefulSet.
 - Access to the required container images (`categoryxyz/monad-*`). Configure `imagePullSecrets` if the registry is private.
 
+## Docker Image
+A Dockerfile is provided to build the image with the necessary monad binaries. You can specify a different version by setting the `VERSION` build argument.
+
 ## Installation
 1. Clone this repository and change into it.
 2. Create a custom values file (for example `my-values.yaml`) with your node identity, peer list, image tags, and secrets.
