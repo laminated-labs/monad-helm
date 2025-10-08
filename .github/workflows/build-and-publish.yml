@@ -52,7 +52,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-mpt
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-rpc
           tags: |
-            type=raw,value=${{ steps.chart_version.outputs.value }}
+            type=raw,value=${{ steps.chart_appversion.outputs.value }}
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
             type=ref,event=tag
