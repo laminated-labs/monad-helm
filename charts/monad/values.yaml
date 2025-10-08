@@ -1,9 +1,9 @@
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets:
-  enable: true
-  create: true
+  enable: false
+  create: false
   secret: ""
-  name: categoryxyz
+  name: ghcr
 
 # This is to override the chart name.
 nameOverride: ''
@@ -34,7 +34,7 @@ otel:
 # Configuration for the mpt container
 mpt:
   image:
-    name: categoryxyz/monad-mpt
+    name: ghcr.io/laminated-labs/monad-mpt
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
@@ -43,7 +43,7 @@ mpt:
 # Configuration for the main bft container
 bft:
   image:
-    name: categoryxyz/monad-bft
+    name: ghcr.io/laminated-labs/monad-bft
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
@@ -53,10 +53,21 @@ bft:
   startupProbe: {}
   additionalArgs: []
 
+full:
+  image:
+    name: ghcr.io/laminated-labs/monad-full-node
+    # This sets the pull policy for images.
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ''
+  livenessProbe: {}
+  readinessProbe: {}
+  startupProbe: {}
+
 # Configuration for the execution container
 execution:
   image:
-    name: categoryxyz/monad-execution
+    name: ghcr.io/laminated-labs/monad-execution
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
@@ -69,7 +80,7 @@ execution:
 # Configuration for the rpc container
 rpc:
   image:
-    name: categoryxyz/monad-rpc
+    name: ghcr.io/laminated-labs/monad-rpc
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
@@ -160,4 +171,3 @@ extraObjects: []
 monitoring:
   enabled: false
   ports: []
-
