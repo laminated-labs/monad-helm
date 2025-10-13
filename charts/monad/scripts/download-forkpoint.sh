@@ -154,5 +154,4 @@ if [ -f "$LOCAL_FORKPOINT" ]; then
 fi
 
 mv "$TEMP_FILE" "$LOCAL_FORKPOINT"
-chown monad:monad "$LOCAL_FORKPOINT"
 echo "Downloaded and installed newer forkpoint file: $REMOTE_FILE_NAME (round $REMOTE_ROUND)"
