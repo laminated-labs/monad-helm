@@ -1,7 +1,14 @@
-# This script is based off of the Monad provided script found at:
-# https://bucket.monadinfra.com/scripts/testnet/download-forkpoint.sh
-# It has been modified to fit the structure of this Helm chart at points
-#
+## This script is based off of the Monad provided script found at:
+## https://bucket.monadinfra.com/scripts/testnet/download-forkpoint.sh
+## It has been modified to fit the structure of this Helm chart, specifically:
+## -- The location of the forkpoint directory + ensuring it exists
+## -- Ownership changes of the files
+## -- Checking for the existence of curl
+##
+## Also please note: This script requires TimeZone data to be installed in the container.
+## By default, ubuntu containers do not have this data installed but debian containers do.
+##
+# 
 # NETWORK: TESTNET
 #!/bin/bash
 
@@ -34,12 +41,27 @@ EOF
     exit 0
 }
 
+# Simple printf wrapper for consistent messaging
+printline() {
+    echo "$@"
+}
+
 # Logging function
 log() {
     if [ "$VERBOSE" = true ]; then
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >&2
     fi
 }
+
+# Ensure curl is available
+if ! command -v curl >/dev/null 2>&1; then
+    printline "curl is not installed. Installing it now..."
+    apt-get update && apt-get install -y curl
+fi
+
+# Ensure forkpoint directories exist
+mkdir -p /monad/forkpoints
+mkdir -p "$LOCAL_FORKPOINT_DIR"
 
 # Parse command line options
 while [[ $# -gt 0 ]]; do
