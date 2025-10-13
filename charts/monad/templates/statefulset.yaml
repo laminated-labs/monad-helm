@@ -154,7 +154,7 @@ spec:
           securityContext:
             privileged: true
           command:
-            - {{ .Values.isFullNode | ternary "monad-full-node" "monad-node" }}
+            - monad-node
           args:
             - --secp-identity
             - /monad/keys/id-secp
