@@ -13,4 +13,9 @@ if [[ ! -f "${SOURCE_FILE}" ]]; then
   exit 1
 fi
 
+if [[ -f "${DEST_FILE}" ]]; then
+  echo "validators.toml already present at ${DEST_FILE}, skipping copy." >&2
+  exit 0
+fi
+
 cp "${SOURCE_FILE}" "${DEST_FILE}"
