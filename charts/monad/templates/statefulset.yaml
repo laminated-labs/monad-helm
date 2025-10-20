@@ -80,14 +80,15 @@ spec:
           volumeDevices:
             - devicePath: /dev/triedb
               name: monad-triedb
-        # Downloads the most recent forkpoint. Will run if no forkpoint.toml exists
+        # Downloads the most recent forkpoint.toml and validators.toml. Will run if
+        # the forkpoint.toml or validators.toml files do not exist
         # or if the sentinel file `SOFT_RESET_SENTINEL_FILE` exists.
         # NOTE: We use the debian container because the script requires proper
         # timezone configuration, which is not available in the ubuntu container.
-        - name: download-forkpoint
+        - name: initialize-configs
           image: debian
           command:
-            - /tmp/scripts/download-forkpoint.sh
+            - /tmp/scripts/initialize-configs.sh
           volumeMounts:
             - mountPath: /monad
               name: monad-data

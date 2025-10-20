@@ -57,13 +57,13 @@ Refer to `charts/monad/values.yaml` for the full list of tunables.
 ## Operational Scripts and Sentinel Files
 The `monad-scripts` ConfigMap injects three helper scripts:
 - `init.sh` – prepares the TrieDB block device, restores from the latest snapshot (using aria2/zstd utilities), and reacts to sentinel files.
-- `download-forkpoint.sh` – periodically fetches the latest forkpoint configuration when none exists or a soft reset is requested.
+- `initialize-configs.sh` – fetches the latest forkpoint and validator configurations when none exists or a soft reset is requested.
 - `clear-old-artifacts.sh` – removes stale WAL, forkpoint, and ledger files after new data is detected.
 
 Sentinel files placed inside the mounted volume toggle maintenance tasks:
 - `/monad/HARD_RESET_SENTINEL_FILE` – wipe the ledger, re-create the TrieDB, and trigger a fresh snapshot restore.
 - `/monad/RESTORE_FROM_SNAPSHOT_SENTINEL_FILE` – re-import the most recent snapshot without a full reset.
-- `/monad/SOFT_RESET_SENTINEL_FILE` – download a fresh `forkpoint.toml`.
+- `/monad/SOFT_RESET_SENTINEL_FILE` – download a fresh `forkpoint.toml` and `validators.toml`.
 
 ## Networking and Services
 - The pod exposes TCP and UDP `8000` via host networking for BFT traffic, and a ClusterIP service mirrors the ports for cluster discovery and optional external DNS annotations.
