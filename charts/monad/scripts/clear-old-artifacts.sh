@@ -11,7 +11,7 @@ then
   echo "$(date -Iseconds) New files detected. Proceeding to delete old artifacts."
 
   find /monad/forkpoint/ -type f -name "forkpoint.toml.*" -mmin +300 -delete
-  find /monad/validators/ -type f -name "validators.toml.*" -mmin +30 -delete
+  find /monad/validators/ -type f -name "validators.toml.*" -mtime +30 -delete
   find /monad/ledger/headers -type f -mmin +600 -delete
   find /monad/ledger/bodies -type f -mmin +600 -delete
   find /monad/ -type f -name "wal_*" -mmin +300 -delete
