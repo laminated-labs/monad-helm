@@ -41,13 +41,15 @@ function reset() {
   mkdir -p /monad/empty-dir
   rsync -r --delete /monad/empty-dir/ /monad/ledger/
   rsync -r --delete /monad/empty-dir/ /monad/forkpoint/
+  rsync -r --delete /monad/empty-dir/ /monad/validators/
   touch /monad/ledger/wal
   rm -rf /monad/empty-dir
+  rm -rf /monad/snapshots
   rm -f /monad/mempool.sock
   rm -f /monad/controlpanel.sock
   rm -f /monad/wal_*
   rm -rf /monad/blockdb
-  blkdiscard /dev/triedb
+  monad-mpt --storage /dev/triedb --truncate --yes
 
   # Remove the reset file
   rm -rf /monad/HARD_RESET_SENTINEL_FILE

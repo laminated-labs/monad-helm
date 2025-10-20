@@ -10,12 +10,13 @@ if [ -n "$NEW_FILES" ]
 then
   echo "$(date -Iseconds) New files detected. Proceeding to delete old artifacts."
 
-  find /monad/forkpoint/ -type f -name "forkpoint.toml.*" -mmin +60 -delete
-  find /monad/ledger/ -type f -name "*.body" -mmin +60 -delete
-  find /monad/ledger/ -type f -name "*.header" -mmin +60 -delete
-  find /monad/ -type f -name "wal_*" -mmin +60 -delete
+  find /monad/forkpoint/ -type f -name "forkpoint.toml.*" -mmin +300 -delete
+  find /monad/validators/ -type f -name "validators.toml.*" -mtime +30 -delete
+  find /monad/ledger/headers -type f -mmin +600 -delete
+  find /monad/ledger/bodies -type f -mmin +600 -delete
+  find /monad/ -type f -name "wal_*" -mmin +300 -delete
 else
-  echo "$(date -Iseconds) No new files detected. Skipping deletion of .header files."
+  echo "$(date -Iseconds) No new files detected. Skipping deletion of ledger files."
 fi
 
 echo "$(date -Iseconds) Finished running clear-old-artifacts.sh"
