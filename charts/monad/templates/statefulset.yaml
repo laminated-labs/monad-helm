@@ -94,19 +94,6 @@ spec:
               name: monad-data
             - mountPath: /tmp/scripts
               name: monad-scripts
-        # Seed the validators directory on the writable volume with the pre-seeded ConfigMap file.
-        - name: seed-validators
-          image: ubuntu
-          command:
-            - /tmp/scripts/seed-validators.sh
-          volumeMounts:
-            - mountPath: /monad
-              name: monad-data
-            - mountPath: /monad/config
-              name: monad-configs
-              readOnly: true
-            - mountPath: /tmp/scripts
-              name: monad-scripts
         # Periodically clears old artifacts to prevent disk space issues
         - name: clear-old-artifacts
           image: ubuntu
