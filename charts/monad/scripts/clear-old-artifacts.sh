@@ -16,7 +16,7 @@ then
   find /monad/ledger/bodies -type f -mmin +600 -delete
   find /monad/ -type f -name "wal_*" -mmin +300 -delete
 else
-  echo "$(date -Iseconds) No new files detected. Skipping deletion of .header files."
+  echo "$(date -Iseconds) No new files detected. Skipping deletion of ledger files."
 fi
 
 echo "$(date -Iseconds) Finished running clear-old-artifacts.sh"
