@@ -50,7 +50,9 @@ function download_forkpoint() {
 function download_validators() {
   check_deps
 
+  printline "Downloading validators file"
   curl -o "${VALIDATORS_FILE}" "https://bucket.monadinfra.com/validators/${NETWORK}/validators.toml"
+  printline "Validators file downloaded"
 }
 
 # If no forkpoint.toml file exists, download it
