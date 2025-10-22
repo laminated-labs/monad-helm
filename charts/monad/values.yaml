@@ -46,17 +46,7 @@ bft:
   livenessProbe: {}
   readinessProbe: {}
   startupProbe: {}
-
-full:
-  image:
-    name: categoryxyz/monad-full-node
-    # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ''
-  livenessProbe: {}
-  readinessProbe: {}
-  startupProbe: {}
+  additionalArgs: []
 
 # Configuration for the execution container
 execution:
@@ -69,6 +59,7 @@ execution:
   livenessProbe: {}
   readinessProbe: {}
   startupProbe: {}
+  additionalArgs: []
 
 # Configuration for the rpc container
 rpc:
@@ -81,6 +72,7 @@ rpc:
   livenessProbe: {}
   readinessProbe: {}
   startupProbe: {}
+  additionalArgs: []
 
 # Used to set the secp and bls keys. Useful for testing. Should NOT be used with live keys.
 secret:

@@ -138,7 +138,7 @@ spec:
         {{- end }}
       containers:
         - name: bft
-          image: {{ .Values.isFullNode | ternary .Values.full.image.name .Values.bft.image.name }}:{{  .Values.bft.image.tag | default .Chart.AppVersion }}
+          image: {{ .Values.bft.image.name }}:{{  .Values.bft.image.tag | default .Chart.AppVersion }}
           securityContext:
             privileged: true
           command:
@@ -172,6 +172,9 @@ spec:
             - "1"
             - --validators-path
             - /monad/validators/validators.toml
+            {{- range .Values.bft.additionalArgs }}
+            - {{ . | quote }}
+            {{- end}}
           env:
             - name: RUST_LOG
               value: debug,h2=warn,tower=warn,monad_statesync=trace
@@ -238,6 +241,9 @@ spec:
             - --allow-unprotected-txs
             - --node-config
             - /monad/config/node.toml
+            {{- range .Values.rpc.additionalArgs }}
+            - {{ . | quote }}
+            {{- end}}
           env:
             - name: RUST_LOG
               value: info
@@ -303,6 +309,9 @@ spec:
             - "2"
             - --log_level
             - INFO
+            {{- range .Values.execution.additionalArgs }}
+            - {{ . | quote }}
+            {{- end}}
           {{- with .Values.execution.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
