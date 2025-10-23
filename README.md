@@ -80,5 +80,12 @@ When `monitoring.enabled: true` the chart:
 - Render templates locally with `helm template` to review generated manifests before applying them to a cluster.
 - Update `version` and `appVersion` in `Chart.yaml` when you publish changes.
 
+## Roadmap
+- [ ] Publish container images built from our Dockerfile.
+- [ ] Build the Monad binaries from source as part of the image build to ensure reproducible and secure releases.
+- [ ] Open source our metrics sidecar application and include it in the published image.
+- [ ] Update Helm chart for eventual mainnet launch.
+- [ ] Incorporate MEV client support.
+
 ## License
 This project is released under the [Apache License 2.0](LICENSE).
