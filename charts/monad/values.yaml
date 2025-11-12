@@ -21,7 +21,8 @@ node:
   beneficiary: "0x0000000000000000000000000000000000000000"
   peers: []
   fullnodes: []
-
+  remoteValidatorsURL: 'https://bucket.monadinfra.com/validators/testnet/validators.toml'
+  remoteForkpointURL: 'https://bucket.monadinfra.com/forkpoint/testnet/forkpoint.toml'
 otel:
   # endpoint: http://peach10.devcore4.com:4317
   endpoint: http://localhost:4317
