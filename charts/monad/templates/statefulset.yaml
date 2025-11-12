@@ -180,6 +180,10 @@ spec:
               value: debug,h2=warn,tower=warn,monad_statesync=trace
             - name: OTEL_ENDPOINT
               value: {{ .Values.otel.endpoint }}
+            - name: REMOTE_VALIDATORS_URL
+              value: {{ .Values.node.remoteValidatorsURL }}
+            - name: REMOTE_FORKPOINT_URL
+              value: {{ .Values.node.remoteForkpointURL }}
             - name: KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
