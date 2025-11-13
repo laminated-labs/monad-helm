@@ -87,6 +87,9 @@ spec:
         # timezone configuration, which is not available in the ubuntu container.
         - name: initialize-configs
           image: debian
+          env:
+            - name: NETWORK
+              value: {{ .Values.node.network }}
           command:
             - /tmp/scripts/initialize-configs.sh
           volumeMounts:
@@ -300,7 +303,7 @@ spec:
             - monad
           args:
             - --chain
-            - monad_testnet
+            - monad_{{ .Values.node.network }}
             - --db
             - /dev/triedb
             - --block_db

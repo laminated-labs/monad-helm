@@ -18,6 +18,7 @@ annotations: {}
 
 node:
   name: ""
+  network: testnet
   beneficiary: "0x0000000000000000000000000000000000000000"
   peers: []
   fullnodes: []

@@ -55,6 +55,8 @@ function download_validators() {
   printline "Validators file downloaded"
 }
 
+printlnine "Initializing config files for ${NETWORK}..."
+
 # If no forkpoint.toml file exists, download it
 if [[ ! -e "${FORKPOINT_FILE}" ]]
 then
