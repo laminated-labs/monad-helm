@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-NETWORK=testnet
+NETWORK={{ .Values.node.network }}
 
 VALIDATORS_CONFIG_PATH=/monad/validators
 VALIDATORS_FILE="${VALIDATORS_CONFIG_PATH}/validators.toml"
