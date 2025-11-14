@@ -170,7 +170,7 @@ spec:
             - --otel-endpoint
             - $(OTEL_ENDPOINT)
             - --keystore-password
-            - "'$(KEYSTORE_PASSWORD)'"
+            - $(KEYSTORE_PASSWORD)
             - --record-metrics-interval-seconds
             - "1"
             - --validators-path

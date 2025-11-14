@@ -24,6 +24,9 @@ node:
   fullnodes: []
   remoteValidatorsURL: 'https://bucket.monadinfra.com/validators/testnet/validators.toml'
   remoteForkpointURL: 'https://bucket.monadinfra.com/forkpoint/testnet/forkpoint.toml'
+  snapshots:
+    enabled: true
+    url: 'https://d1v5yevi7k4blc.cloudfront.net'
 otel:
   # endpoint: http://peach10.devcore4.com:4317
   endpoint: http://localhost:4317

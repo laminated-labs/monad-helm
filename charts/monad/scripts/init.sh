@@ -74,7 +74,7 @@ function initialize_triedb() {
 # Based on the Monad provided script found at:
 # https://pub-b0d0d7272c994851b4c8af22a766f571.r2.dev/scripts/testnet/restore_from_snapshot.sh
 function restore_from_snapshot() {
-  CLOUDFRONT_URL="https://d1v5yevi7k4blc.cloudfront.net"
+  CLOUDFRONT_URL={{ .Values.node.snapshots.url | quote }}
   DEST_FOLDER="/monad/snapshots"
 
   check_dependency aria2c aria2
@@ -158,9 +158,14 @@ fi
 # Restore from snapshot if the sentinel file is present
 if [ -e /monad/RESTORE_FROM_SNAPSHOT_SENTINEL_FILE ]
 then
+  {{- if .Values.node.snapshots.enabled }}
   printline "Restoring from snapshot"
   restore_from_snapshot
   printline "Extract completed, you can start the node by fetching a new forkpoint and run docker compose up -d"
+  {{- else }}
+  printline "Snapshot restore requested but snapshot restore is disabled in configuration, skipping restore"
+  rm /monad/RESTORE_FROM_SNAPSHOT_SENTINEL_FILE
+  {{- end }}
 else
   printline "No restore-from-snapshot sentinel file found, skipping restore"
 fi
