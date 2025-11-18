@@ -120,6 +120,12 @@ spec:
           image: otel/opentelemetry-collector-contrib:latest
           imagePullPolicy: IfNotPresent
           restartPolicy: Always
+          env:
+            - name: SECP_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: secp_public_key
           args:
             - --config=/mount/otel-collector-config.yaml
           ports:
