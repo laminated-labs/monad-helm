@@ -28,7 +28,7 @@ node:
     enabled: true
     url: 'https://d1v5yevi7k4blc.cloudfront.net'
 otel:
-  # endpoint: http://peach10.devcore4.com:4317
+  # endpoint: https://otel-external.monadinfra.com:443
   endpoint: http://localhost:4317
 
 # Configuration for the mpt container
