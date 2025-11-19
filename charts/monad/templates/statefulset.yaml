@@ -316,10 +316,8 @@ spec:
             - /monad/ledger
             - --statesync
             - /monad/statesync.sock
-            - --ro_sq_thread_cpu
-            - "1"
             - --sq_thread_cpu
-            - "2"
+            - "1"
             - --log_level
             - INFO
             {{- range .Values.execution.additionalArgs }}
