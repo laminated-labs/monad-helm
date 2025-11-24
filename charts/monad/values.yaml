@@ -27,6 +27,8 @@ node:
   snapshots:
     enabled: true
     url: 'https://d1v5yevi7k4blc.cloudfront.net'
+  terminationGracePeriodSeconds:
+
 otel:
   # endpoint: https://otel-external.monadinfra.com:443
   endpoint: http://localhost:4317
