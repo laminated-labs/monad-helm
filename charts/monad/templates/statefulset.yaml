@@ -355,6 +355,9 @@ spec:
               {{- toYaml . | nindent 12 }}
             {{- end }}
       restartPolicy: Always
+      {{- if .Values.node.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.node.terminationGracePeriodSeconds }}
+      {{- end }}
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       volumes:
