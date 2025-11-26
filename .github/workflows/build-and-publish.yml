@@ -50,7 +50,6 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-bft
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-execution
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-full-node
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-mpt
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-rpc
           tags: |

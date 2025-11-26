@@ -53,17 +53,6 @@ bft:
   startupProbe: {}
   additionalArgs: []
 
-full:
-  image:
-    name: ghcr.io/laminated-labs/monad-full-node
-    # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ''
-  livenessProbe: {}
-  readinessProbe: {}
-  startupProbe: {}
-
 # Configuration for the execution container
 execution:
   image:
