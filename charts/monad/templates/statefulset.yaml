@@ -101,14 +101,7 @@ spec:
         - name: clear-old-artifacts
           image: ubuntu
           command:
-            - bash
-            - -c
-            - |
-              while true
-              do
-                /tmp/scripts/clear-old-artifacts.sh
-                sleep 600
-              done
+            - /tmp/scripts/clear-old-artifacts.sh
           restartPolicy: Always
           volumeMounts:
             - mountPath: /monad
