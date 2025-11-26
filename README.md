@@ -84,8 +84,8 @@ When `monitoring.enabled: true` the chart:
 - [ ] Publish container images built from our Dockerfile.
 - [ ] Build the Monad binaries from source as part of the image build to ensure reproducible and secure releases.
 - [ ] Open source our metrics sidecar application and include it in the published image.
-- [ ] Update Helm chart for eventual mainnet launch.
 - [ ] Incorporate MEV client support.
+- [ ] Support pulling 3rd party snapshot
 
 ## License
 This project is released under the [Apache License 2.0](LICENSE).
