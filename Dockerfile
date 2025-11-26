@@ -1,3 +1,6 @@
+FROM debian:stable-slim AS tini
+RUN apt update && apt install -yqq tini
+
 FROM ubuntu:24.04
 
 # Matches chart appVersion without the leading v (workflow strips it when building)
@@ -31,3 +34,7 @@ RUN rm -rf /var/cache/apk/* \
 
 ENV RUST_LOG=info
 ENV RUST_BACKTRACE=1
+
+COPY --from=tini /usr/bin/tini /usr/bin/tini
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
