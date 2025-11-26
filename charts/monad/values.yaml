@@ -9,8 +9,6 @@ imagePullSecrets:
 nameOverride: ''
 fullnameOverride: ''
 
-isFullNode: false
-
 # Number of replicas to run
 replicaCount: 1
 
