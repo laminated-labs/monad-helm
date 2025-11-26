@@ -1,6 +1,7 @@
 FROM ubuntu:24.04
 
-ARG VERSION=0.10.4
+# Matches chart appVersion without the leading v (workflow strips it when building)
+ARG VERSION=0.12.2
 
 # aria2, rsync, zstd are used by monad init scripts
 RUN apt update && apt install -yqq ca-certificates gnupg2 curl aria2 rsync zstd

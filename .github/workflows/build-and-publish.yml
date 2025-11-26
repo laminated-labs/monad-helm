@@ -25,8 +25,10 @@ jobs:
       - name: Extract chart appVersion
         id: chart_appversion
         run: |
-          version=$(grep '^appVersion:' charts/monad/Chart.yaml | awk '{print $2}' | tr -d '"')
-          echo "value=${version}" >> "$GITHUB_OUTPUT"
+          raw=$(grep '^appVersion:' charts/monad/Chart.yaml | awk '{print $2}' | tr -d '"')
+          clean="${raw#v}"  # drop leading v for package versioning/tagging
+          echo "raw=${raw}" >> "$GITHUB_OUTPUT"
+          echo "clean=${clean}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU (multi-arch builds)
         uses: docker/setup-qemu-action@v3
@@ -52,7 +54,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-mpt
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-rpc
           tags: |
-            type=raw,value=${{ steps.chart_appversion.outputs.value }}
+            type=raw,value=${{ steps.chart_appversion.outputs.clean }}
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
             type=ref,event=tag
@@ -64,6 +66,6 @@ jobs:
           context: .
           push: true
           build-args: |
-            VERSION=${{ steps.chart_appversion.outputs.value }}
+            VERSION=${{ steps.chart_appversion.outputs.clean }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
