@@ -1,9 +1,9 @@
 # Monad Helm Chart
 
-Deploy Monad validator or full nodes on Kubernetes using the Helm chart contained in this repository. The chart provisions the services, persistent storage, sidecar scripts, and telemetry hooks required to operate a Monad testnet node with automated snapshot restores and forkpoint management.
+Deploy Monad validator or full nodes (same binary; a full node is simply an unregistered validator) on Kubernetes using the Helm chart contained in this repository. The chart provisions the services, persistent storage, sidecar scripts, and telemetry hooks required to operate a Monad node with automated snapshot restores and forkpoint management.
 
 ## Repository Layout
-- `charts/monad/Chart.yaml` – chart metadata (version `1.0.0`, app version `v0.10.4`).
+- `charts/monad/Chart.yaml` – chart metadata (version `1.0.7`, app version `v0.12.2`).
 - `charts/monad/values.yaml` – default values for replica count, images, node configuration, and monitoring.
 - `charts/monad/templates/` – Kubernetes manifests for the StatefulSet, Services, Secrets, PVCs, and optional monitoring resources.
 - `charts/monad/configs/` – config files packaged into a ConfigMap (genesis data, validator set, OpenTelemetry collector config, node map, and sample `node.toml`, files need to be sourced from Monad validator documentation).
@@ -17,12 +17,12 @@ Deploy Monad validator or full nodes on Kubernetes using the Helm chart containe
 - Access to the required container images (`categoryxyz/monad-*`). Configure `imagePullSecrets` if the registry is private.
 
 ## Docker Image
-A Dockerfile is provided to build the image with the necessary monad binaries. You can specify a different version by setting the `VERSION` build argument.
+A Dockerfile is provided to build the image with the necessary monad binaries. You can specify a different version by setting the `VERSION` build argument. The chart defaults align with mainnet-compatible images (app version `v0.12.2`).
 
 ## Installation
 1. Clone this repository and change into it.
 2. Create a custom values file (for example `my-values.yaml`) with your node identity, peer list, image tags, and secrets.
-3. Follow the steps in the Monad documentation to download the necessary configuration files into `charts/monad/configs/`.
+3. Follow the steps in the Monad documentation to download the necessary configuration files into `charts/monad/configs/` (this repo only includes the OpenTelemetry collector config by default).
     - `genesis.json` – the genesis block for the network.
     - `node.toml` - node configuration
     - `node-map.csv` - list of known peers.
@@ -40,12 +40,11 @@ A Dockerfile is provided to build the image with the necessary monad binaries. Y
 | Value | Description |
 | ----- | ----------- |
 | `replicaCount` | Number of Monad pods to run (defaults to `1`). |
-| `isFullNode` | When `true`, runs the `monad-full-node` binary instead of the validator (`monad-node`). |
-| `imagePullSecrets.*` | Configure registry credentials; set `create: true` and provide `secret` (Docker config JSON, base64-encoded) to generate the secret automatically. |
-| `bft.image`, `execution.image`, `rpc.image`, `full.image`, `mpt.image` | Container images for the different Monad components; override tags to pin specific releases. |
+| `imagePullSecrets.*` | Configure registry credentials; set `create: true` and provide `secret` (raw Docker config JSON, **not** base64) to generate the secret automatically. |
+| `bft.image`, `execution.image`, `rpc.image`, `mpt.image` | Container images for the different Monad components; override tags to pin specific releases. |
 | `node.*` | Populate node metadata and peer lists consumed by `configs/node.toml` (e.g., `node.name`, `node.address`, `node.peers`, `node.fullnodes`). |
-| `secret.*` | Control how validator keys are mounted. Set `create: true`, provide base64-encoded `secp`, `bls`, and `keystorePassword`, or point `name` at an existing secret with the keys `id-secp`, `id-bls`, and `KEYSTORE_PASSWORD`. |
-| `monitoring.enabled` | Adds an OpenTelemetry Collector sidecar and a `PodMonitor`. Configure additional scraped `ports` to expose extra metrics endpoints. |
+| `secret.*` | Control how validator keys are mounted. Set `create: true`, provide base64-encoded `secp`, `bls`, and `keystorePassword` fields (note the keys are `secp`/`bls`, not `secpKey`/`blsKey`), or point `name` at an existing secret with the keys `id-secp`, `id-bls`, and `KEYSTORE_PASSWORD`. |
+| `monitoring.enabled` | Renders a PodMonitor and OpenTelemetry collector sidecar (declared under the initContainers block), plus config for additional scrape targets via `monitoring.ports`. |
 | `extraInitContainers`, `extraVolumes`, `extraVolumeMounts`, `extraObjects` | Inject additional operational logic or manifests without forking the chart. |
 
 Refer to `charts/monad/values.yaml` for the full list of tunables.
@@ -66,12 +65,12 @@ Sentinel files placed inside the mounted volume toggle maintenance tasks:
 - `/monad/SOFT_RESET_SENTINEL_FILE` – download a fresh `forkpoint.toml` and `validators.toml`.
 
 ## Networking and Services
-- The pod exposes TCP and UDP `8000` via host networking for BFT traffic, and a ClusterIP service mirrors the ports for cluster discovery and optional external DNS annotations.
-- RPC traffic is available on port `8080`. Adjust ingress or service resources as required by your environment.
+- The pod exposes TCP and UDP `8000` via host networking for BFT traffic. A headless Service publishes the same ports (plus the otel port) for discovery and optional external DNS annotations.
+- RPC traffic binds to port `8080` on the host network only; the Service does not expose RPC. Add your own Service/Ingress if cluster-level access is required.
 
 ## Monitoring
 When `monitoring.enabled: true` the chart:
-- Runs an `otel/opentelemetry-collector-contrib` sidecar configured via `configs/otel-collector-config.yaml` (default export to `peach10.devcore4.com:4317` and a Prometheus endpoint on `8889`).
+- Runs an OpenTelemetry collector sidecar (declared under the initContainers block) with config from `configs/otel-collector-config.yaml`, exporting to the mainnet endpoint `https://otel-external.monadinfra.com:443` and exposing Prometheus metrics on `8889`.
 - Creates a `PodMonitor` (for Prometheus Operator) and allows additional port scraping via `monitoring.ports`.
 - Propagates `OTEL_ENDPOINT` to the BFT and RPC containers so they can emit traces/metrics.
 
