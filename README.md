@@ -14,7 +14,7 @@ Deploy Monad validator or full nodes (same binary; a full node is simply an unre
 - Helm 3.10+ installed locally.
 - Storage classes capable of provisioning the default PersistentVolumeClaims (`1.7Ti` NVMe filesystem and `1.7Ti` block volume). Override `pvc.yaml` settings if your environment differs.
 - Worker nodes configured with huge pages (`HugePages-2Mi` and `HugePages-1Gi`) to satisfy the pod limits configured in the StatefulSet.
-- Access to the required container images (`categoryxyz/monad-*`). Configure `imagePullSecrets` if the registry is private.
+- Access to the required container images (`ghcr.io/laminated-labs/monad-*`). Configure `imagePullSecrets` if the registry is private; defaults assume public GHCR access.
 
 ## Docker Image
 A Dockerfile is provided to build the image with the necessary monad binaries. You can specify a different version by setting the `VERSION` build argument. The chart defaults align with mainnet-compatible images (app version `v0.12.2`).
@@ -40,7 +40,7 @@ A Dockerfile is provided to build the image with the necessary monad binaries. Y
 | Value | Description |
 | ----- | ----------- |
 | `replicaCount` | Number of Monad pods to run (defaults to `1`). |
-| `imagePullSecrets.*` | Configure registry credentials; set `create: true` and provide `secret` (raw Docker config JSON, **not** base64) to generate the secret automatically. |
+| `imagePullSecrets.*` | Configure registry credentials for GHCR; set `create: true` and provide `secret` (raw Docker config JSON, **not** base64) to generate the secret automatically. Defaults leave this disabled for public pulls. |
 | `bft.image`, `execution.image`, `rpc.image`, `mpt.image` | Container images for the different Monad components; override tags to pin specific releases. |
 | `node.*` | Populate node metadata and peer lists consumed by `configs/node.toml` (e.g., `node.name`, `node.address`, `node.peers`, `node.fullnodes`). |
 | `secret.*` | Control how validator keys are mounted. Set `create: true`, provide base64-encoded `secp`, `bls`, and `keystorePassword` fields (note the keys are `secp`/`bls`, not `secpKey`/`blsKey`), or point `name` at an existing secret with the keys `id-secp`, `id-bls`, and `KEYSTORE_PASSWORD`. |
