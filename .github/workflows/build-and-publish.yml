@@ -25,7 +25,7 @@ jobs:
       - name: Extract chart appVersion
         id: chart_appversion
         run: |
-          raw=$(grep '^appVersion:' charts/monad/Chart.yaml | awk '{print $2}' | tr -d '"')
+          raw=$(grep '^appVersion:' charts/monad/Chart.yaml | awk '{print $2}' | sed "s/[\"']//g") # strip both quote types
           clean="${raw#v}"  # drop leading v for package versioning/tagging
           echo "raw=${raw}" >> "$GITHUB_OUTPUT"
           echo "clean=${clean}" >> "$GITHUB_OUTPUT"
