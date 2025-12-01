@@ -3,7 +3,7 @@
 Deploy Monad validator or full nodes (same binary; a full node is simply an unregistered validator) on Kubernetes using the Helm chart contained in this repository. The chart provisions the services, persistent storage, sidecar scripts, and telemetry hooks required to operate a Monad node with automated snapshot restores and forkpoint management.
 
 ## Repository Layout
-- `charts/monad/Chart.yaml` – chart metadata (version `1.0.7`, app version `v0.12.2`).
+- `charts/monad/Chart.yaml` – chart metadata (version `1.0.10`, app version `v0.12.2-rpc-hotfix2`).
 - `charts/monad/values.yaml` – default values for replica count, images, node configuration, and monitoring.
 - `charts/monad/templates/` – Kubernetes manifests for the StatefulSet, Services, Secrets, PVCs, and optional monitoring resources.
 - `charts/monad/configs/` – config files packaged into a ConfigMap (genesis data, validator set, OpenTelemetry collector config, node map, and sample `node.toml`, files need to be sourced from Monad validator documentation).
@@ -14,10 +14,10 @@ Deploy Monad validator or full nodes (same binary; a full node is simply an unre
 - Helm 3.10+ installed locally.
 - Storage classes capable of provisioning the default PersistentVolumeClaims (`1.7Ti` NVMe filesystem and `1.7Ti` block volume). Override `pvc.yaml` settings if your environment differs.
 - Worker nodes configured with huge pages (`HugePages-2Mi` and `HugePages-1Gi`) to satisfy the pod limits configured in the StatefulSet.
-- Access to the required container images (`ghcr.io/laminated-labs/monad-*`). Configure `imagePullSecrets` if the registry is private; defaults assume public GHCR access.
+- Access to the required container image (`ghcr.io/laminated-labs/monad`). Configure `imagePullSecrets` if the registry is private; defaults assume public GHCR access.
 
 ## Docker Image
-A Dockerfile is provided to build the image with the necessary monad binaries. You can specify a different version by setting the `VERSION` build argument. The chart defaults align with mainnet-compatible images (app version `v0.12.2`).
+A single Dockerfile builds the shared image used by all chart containers (bft, execution, rpc, and mpt). You can specify a different version by setting the `VERSION` build argument (defaults to `0.12.2-rpc-hotfix2`). The GitHub Actions workflow builds and publishes `ghcr.io/laminated-labs/monad` using the chart `appVersion`, so the chart and image stay in lockstep.
 
 ## Installation
 1. Clone this repository and change into it.
@@ -41,7 +41,8 @@ A Dockerfile is provided to build the image with the necessary monad binaries. Y
 | ----- | ----------- |
 | `replicaCount` | Number of Monad pods to run (defaults to `1`). |
 | `imagePullSecrets.*` | Configure registry credentials for GHCR; set `create: true` and provide `secret` (raw Docker config JSON, **not** base64) to generate the secret automatically. Defaults leave this disabled for public pulls. |
-| `bft.image`, `execution.image`, `rpc.image`, `mpt.image` | Container images for the different Monad components; override tags to pin specific releases. |
+| `image.*` | Shared image settings (name, pullPolicy, tag) used across all Monad containers; defaults to `ghcr.io/laminated-labs/monad` with the chart appVersion. |
+| `bft.image`, `execution.image`, `rpc.image`, `mpt.image` | Optional per-container overrides for image name/tag/pullPolicy; leave empty to inherit from `image.*`. |
 | `node.*` | Populate node metadata and peer lists consumed by `configs/node.toml` (e.g., `node.name`, `node.address`, `node.peers`, `node.fullnodes`). |
 | `secret.*` | Control how validator keys are mounted. Set `create: true`, provide base64-encoded `secp`, `bls`, and `keystorePassword` fields (note the keys are `secp`/`bls`, not `secpKey`/`blsKey`), or point `name` at an existing secret with the keys `id-secp`, `id-bls`, and `KEYSTORE_PASSWORD`. |
 | `monitoring.enabled` | Renders a PodMonitor and OpenTelemetry collector sidecar (declared under the initContainers block), plus config for additional scrape targets via `monitoring.ports`. |
@@ -80,7 +81,6 @@ When `monitoring.enabled: true` the chart:
 - Update `version` and `appVersion` in `Chart.yaml` when you publish changes.
 
 ## Roadmap
-- [ ] Publish container images built from our Dockerfile.
 - [ ] Build the Monad binaries from source as part of the image build to ensure reproducible and secure releases.
 - [ ] Open source our metrics sidecar application and include it in the published image.
 - [ ] Incorporate MEV client support.
