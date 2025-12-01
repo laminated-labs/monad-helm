@@ -1,3 +1,16 @@
+{{- $image := .Values.image -}}
+{{- $mptImageName := default $image.name .Values.mpt.image.name -}}
+{{- $mptImageTag := default .Chart.AppVersion (default $image.tag .Values.mpt.image.tag) -}}
+{{- $mptImagePullPolicy := default $image.pullPolicy .Values.mpt.image.pullPolicy -}}
+{{- $bftImageName := default $image.name .Values.bft.image.name -}}
+{{- $bftImageTag := default .Chart.AppVersion (default $image.tag .Values.bft.image.tag) -}}
+{{- $bftImagePullPolicy := default $image.pullPolicy .Values.bft.image.pullPolicy -}}
+{{- $rpcImageName := default $image.name .Values.rpc.image.name -}}
+{{- $rpcImageTag := default .Chart.AppVersion (default $image.tag .Values.rpc.image.tag) -}}
+{{- $rpcImagePullPolicy := default $image.pullPolicy .Values.rpc.image.pullPolicy -}}
+{{- $executionImageName := default $image.name .Values.execution.image.name -}}
+{{- $executionImageTag := default .Chart.AppVersion (default $image.tag .Values.execution.image.tag) -}}
+{{- $executionImagePullPolicy := default $image.pullPolicy .Values.execution.image.pullPolicy -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -36,19 +49,6 @@ spec:
       {{- with .Values.podSecurityContext }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- $image := .Values.image -}}
-      {{- $mptImageName := default $image.name .Values.mpt.image.name -}}
-      {{- $mptImageTag := default .Chart.AppVersion (default $image.tag .Values.mpt.image.tag) -}}
-      {{- $mptImagePullPolicy := default $image.pullPolicy .Values.mpt.image.pullPolicy -}}
-      {{- $bftImageName := default $image.name .Values.bft.image.name -}}
-      {{- $bftImageTag := default .Chart.AppVersion (default $image.tag .Values.bft.image.tag) -}}
-      {{- $bftImagePullPolicy := default $image.pullPolicy .Values.bft.image.pullPolicy -}}
-      {{- $rpcImageName := default $image.name .Values.rpc.image.name -}}
-      {{- $rpcImageTag := default .Chart.AppVersion (default $image.tag .Values.rpc.image.tag) -}}
-      {{- $rpcImagePullPolicy := default $image.pullPolicy .Values.rpc.image.pullPolicy -}}
-      {{- $executionImageName := default $image.name .Values.execution.image.name -}}
-      {{- $executionImageTag := default .Chart.AppVersion (default $image.tag .Values.execution.image.tag) -}}
-      {{- $executionImagePullPolicy := default $image.pullPolicy .Values.execution.image.pullPolicy -}}
       initContainers:
         # Enable necessary sysctl settings
         - name: sysctl
