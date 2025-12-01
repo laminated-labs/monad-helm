@@ -25,7 +25,15 @@ node:
   snapshots:
     enabled: true
     url: 'https://d1v5yevi7k4blc.cloudfront.net'
-  terminationGracePeriodSeconds:
+  terminationGracePeriodSeconds: 30
+
+monlog:
+  enable: false
+  image:
+    name: monlog
+    tag: latest
+    pullPolicy: IfNotPresent
+  pollIntervalSeconds: 5
 
 otel:
   # endpoint: https://otel-external.monadinfra.com:443
