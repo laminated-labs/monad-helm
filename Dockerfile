@@ -11,7 +11,7 @@ RUN curl -sSL https://pub-b0d0d7272c994851b4c8af22a766f571.r2.dev/scripts/monlog
 FROM ubuntu:24.04
 
 # Matches chart appVersion without the leading v (workflow strips it when building)
-ARG VERSION=0.12.2
+ARG VERSION=0.12.2-rpc-hotfix2
 
 # aria2, rsync, zstd are used by monad init scripts
 RUN apt update && apt install -yqq ca-certificates gnupg2 curl aria2 rsync zstd
