@@ -1,4 +1,4 @@
-name: Build and Publish Docker Images
+name: Build and Publish Docker Image
 
 on:
   push:
@@ -48,10 +48,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-bft
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-execution
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-mpt
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad-rpc
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/monad
           tags: |
             type=raw,value=${{ steps.chart_appversion.outputs.clean }}
             type=raw,value=latest,enable={{is_default_branch}}
