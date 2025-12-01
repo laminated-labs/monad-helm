@@ -138,6 +138,57 @@ spec:
         {{- with .Values.extraInitContainers}}
           {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
+        {{- if eq .Values.monlog.enable true }}
+        - name: monlog
+          image: {{ .Values.monlog.image.name }}:{{ .Values.monlog.image.tag }}
+          imagePullPolicy: {{ .Values.monlog.image.pullPolicy }}
+          restartPolicy: Always
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: INPUT_FILE
+              value: /var/log/pods/$(NAMESPACE)_$(POD_NAME)_$(POD_UID)/bft/0.log
+          command:
+            - /bin/bash
+            - -c
+            - |
+              stop=0
+              sleep_pid=""
+
+              trap '
+                stop=1
+                if [ -n "$sleep_pid" ]; then
+                  kill "$sleep_pid" 2>/dev/null || true
+                fi
+              ' TERM INT
+
+              while [ "$stop" -eq 0 ]
+              do
+                /usr/local/bin/monlog $INPUT_FILE
+
+                sleep_pid=""
+                sleep {{ .Values.monlog.pollIntervalSeconds }} &
+                sleep_pid="$!"
+
+                wait "$sleep_pid" || true
+              done
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - mountPath: /home/monad/monad-bft/config
+              name: monad-configs
+        {{- end }}
       containers:
         - name: bft
           image: {{ .Values.bft.image.name }}:{{  .Values.bft.image.tag | default .Chart.AppVersion }}
