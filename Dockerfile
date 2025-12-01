@@ -1,6 +1,17 @@
+FROM debian:stable-slim AS tini
+RUN apt update && apt install -yqq tini
+
+FROM debian AS monlog
+
+RUN apt update && apt install -yqq curl
+
+RUN curl -sSL https://pub-b0d0d7272c994851b4c8af22a766f571.r2.dev/scripts/monlog -o /usr/local/bin/monlog && \
+    chmod +x /usr/local/bin/monlog
+
 FROM ubuntu:24.04
 
-ARG VERSION=0.10.4
+# Matches chart appVersion without the leading v (workflow strips it when building)
+ARG VERSION=0.12.2
 
 # aria2, rsync, zstd are used by monad init scripts
 RUN apt update && apt install -yqq ca-certificates gnupg2 curl aria2 rsync zstd
@@ -30,3 +41,8 @@ RUN rm -rf /var/cache/apk/* \
 
 ENV RUST_LOG=info
 ENV RUST_BACKTRACE=1
+
+COPY --from=tini /usr/bin/tini /usr/bin/tini
+COPY --from=monlog /usr/local/bin/monlog /usr/local/bin/monlog
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
