@@ -5,6 +5,13 @@ imagePullSecrets:
   secret: ""
   name: ghcr
 
+# Shared image used by all Monad containers unless overridden per-component below.
+image:
+  name: ghcr.io/laminated-labs/monad
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ''
+
 # This is to override the chart name.
 nameOverride: ''
 fullnameOverride: ''
@@ -42,19 +49,15 @@ otel:
 # Configuration for the mpt container
 mpt:
   image:
-    name: ghcr.io/laminated-labs/monad-mpt
-    # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    name: ''
+    pullPolicy: ''
     tag: ''
 
 # Configuration for the main bft container
 bft:
   image:
-    name: ghcr.io/laminated-labs/monad-bft
-    # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    name: ''
+    pullPolicy: ''
     tag: ''
   livenessProbe: {}
   readinessProbe: {}
@@ -64,10 +67,8 @@ bft:
 # Configuration for the execution container
 execution:
   image:
-    name: ghcr.io/laminated-labs/monad-execution
-    # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    name: ''
+    pullPolicy: ''
     tag: ''
   livenessProbe: {}
   readinessProbe: {}
@@ -77,10 +78,8 @@ execution:
 # Configuration for the rpc container
 rpc:
   image:
-    name: ghcr.io/laminated-labs/monad-rpc
-    # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    name: ''
+    pullPolicy: ''
     tag: ''
   livenessProbe: {}
   readinessProbe: {}
