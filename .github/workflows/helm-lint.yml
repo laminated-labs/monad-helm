@@ -1,0 +1,25 @@
+name: Helm Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.18.3
+
+      - name: Helm lint
+        run: helm lint charts/monad
+
+      - name: Helm template render
+        run: helm template monad charts/monad -f charts/monad/values.yaml >/dev/null
