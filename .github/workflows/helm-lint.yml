@@ -21,5 +21,14 @@ jobs:
       - name: Helm lint
         run: helm lint charts/monad
 
-      - name: Helm template render
-        run: helm template monad charts/monad -f charts/monad/values.yaml >/dev/null
+      - name: Install kubeconform
+        run: |
+          curl -sSL -o kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz
+          tar -xzf kubeconform.tar.gz kubeconform
+          sudo install -m 0755 kubeconform /usr/local/bin/kubeconform
+
+      - name: Render manifests
+        run: helm template monad charts/monad -f charts/monad/values.yaml > rendered.yaml
+
+      - name: Validate manifests with kubeconform
+        run: kubeconform -strict -summary rendered.yaml
