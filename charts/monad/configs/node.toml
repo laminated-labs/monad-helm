@@ -79,23 +79,19 @@ secp256k1_pubkey = {{ .pubkey | quote }}
 identities = []
 {{- end }}
 
+[blocksync_override]
+peers = []
+
 [statesync]
 expand_to_group = true
 
-{{- if .Values.node.peers }}
-{{- range .Values.node.peers }}
-[[blocksync_override.peers]]
-secp256k1_pubkey = {{ . | quote }}
-
-[[statesync.peers]]
-secp256k1_pubkey = {{ . | quote }}
-{{- end }}
-{{- else }}
-[blocksync_override]
-peers = []
-{{- end }}
-
 {{- range $networkValues.initPeers }}
+
+[[statesync.init_peers]]
+secp256k1_pubkey = {{ . | quote }}
+{{- end }}
+
+{{- range .Values.node.peers }}
 
 [[statesync.init_peers]]
 secp256k1_pubkey = {{ . | quote }}
