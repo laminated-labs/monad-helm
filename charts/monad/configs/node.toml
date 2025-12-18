@@ -79,18 +79,21 @@ secp256k1_pubkey = {{ .pubkey | quote }}
 identities = []
 {{- end }}
 
+[statesync]
+expand_to_group = true
+
 {{- if .Values.node.peers }}
 {{- range .Values.node.peers }}
 [[blocksync_override.peers]]
+secp256k1_pubkey = {{ . | quote }}
+
+[[statesync.peers]]
 secp256k1_pubkey = {{ . | quote }}
 {{- end }}
 {{- else }}
 [blocksync_override]
 peers = []
 {{- end }}
-
-[statesync]
-expand_to_group = true
 
 {{- range $networkValues.initPeers }}
 
@@ -99,6 +102,15 @@ secp256k1_pubkey = {{ . | quote }}
 {{- end }}
 
 {{- range $networkValues.bootstrapPeers }}
+
+[[bootstrap.peers]]
+address = {{ .address | quote }}
+record_seq_num = {{ .recordSeqNum }}
+name_record_sig = {{ .nameRecordSig | quote }}
+secp256k1_pubkey = {{ .pubkey | quote }}
+{{- end }}
+
+{{- range .Values.node.bootstrapPeers }}
 
 [[bootstrap.peers]]
 address = {{ .address | quote }}
