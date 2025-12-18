@@ -26,6 +26,7 @@ node:
   network: testnet
   beneficiary: "0x0000000000000000000000000000000000000000"
   peers: []
+  bootstrapPeers: []
   fullnodes: []
   remoteValidatorsURL: 'https://bucket.monadinfra.com/validators/testnet/validators.toml'
   remoteForkpointURL: 'https://bucket.monadinfra.com/forkpoint/testnet/forkpoint.toml'
