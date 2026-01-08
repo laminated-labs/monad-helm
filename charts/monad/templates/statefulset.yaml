@@ -240,6 +240,8 @@ spec:
             - "1"
             - --validators-path
             - /monad/validators/validators.toml
+            - --persisted-peers-path
+            - /monad/config/peers.toml
             {{- range .Values.bft.additionalArgs }}
             - {{ . | quote }}
             {{- end}}
