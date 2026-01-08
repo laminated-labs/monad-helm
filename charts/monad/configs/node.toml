@@ -30,12 +30,13 @@ chain_id = {{ $networkValues.chainId }}
 self_address = {{ .Values.node.address | quote }} # add <IP>:<PORT>
 self_record_seq_num = {{ .Values.node.seqNum }}                   # Should be 0 initially
 self_name_record_sig = {{ .Values.node.recordSig | quote }} # add <name_record_sig>
-refresh_period = 120
+refresh_period = 20
 request_timeout = 5
 unresponsive_prune_threshold = 3
 last_participation_prune_threshold = 1000
-min_num_peers = 150
-max_num_peers = 350
+min_num_peers = 1
+max_num_peers = 450
+ping_rate_limit_per_second = 100
 
 [fullnode_raptorcast]
 enable_client = {{ .Values.node.enableClient }}
