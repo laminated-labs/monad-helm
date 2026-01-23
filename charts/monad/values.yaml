@@ -34,6 +34,10 @@ node:
     enabled: true
     url: 'https://d1v5yevi7k4blc.cloudfront.net'
   terminationGracePeriodSeconds: 30
+  address: ""
+  authPort: 8001
+  recordSig: ""
+  seqNum: 0
 
 monlog:
   enable: false
