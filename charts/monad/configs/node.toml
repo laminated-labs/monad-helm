@@ -30,7 +30,9 @@ chain_id = {{ $networkValues.chainId }}
 self_address = {{ .Values.node.address | quote }} # add <IP>:<PORT>
 self_record_seq_num = {{ .Values.node.seqNum }}                   # Should be 0 initially
 self_name_record_sig = {{ .Values.node.recordSig | quote }} # add <name_record_sig>
-self_auth_port = {{ .Values.node.authPort }}
+{{- if .Values.authUDP.enabled}}
+self_auth_port = {{ .Values.authUDP.port }}
+{{- end }}
 refresh_period = 20
 request_timeout = 5
 unresponsive_prune_threshold = 3
@@ -60,7 +62,9 @@ identities = []
 [network]
 bind_address_host = "0.0.0.0"
 bind_address_port = 8000
-authenticated_bind_address_port = {{ .Values.node.authPort }}
+{{- if .Values.authUDP.enabled }}
+authenticated_bind_address_port = {{ .Values.authUDP.port }}
+{{- end }}
 max_rtt_ms = 300
 max_mbps = 1000
 

@@ -268,10 +268,12 @@ spec:
               hostPort: 8000
               protocol: TCP
               name: bft-tcp
-            - containerPort: 8001
-              hostPort: 8001
+            {{- if .Values.authUDP.enabled }}
+            - containerPort: {{ .Values.authUDP.port }}
+              hostPort: {{ .Values.authUDP.port }}
               protocol: UDP
               name: bft-auth
+            {{- end }}
           {{- with .Values.bft.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
