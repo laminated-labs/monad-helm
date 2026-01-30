@@ -17,10 +17,12 @@ spec:
       targetPort: bft-udp
       protocol: UDP
       name: bft-udp
-    - port: 8001
+    {{- if .Values.authUDP.enabled }}
+    - port: {{ .Values.authUDP.port }}
       targetPort: bft-auth
       protocol: UDP
       name: bft-auth
+    {{- end }}
     - port: 8889
       name: otel
       targetPort: otel

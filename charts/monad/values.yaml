@@ -35,9 +35,12 @@ node:
     url: 'https://d1v5yevi7k4blc.cloudfront.net'
   terminationGracePeriodSeconds: 30
   address: ""
-  authPort: 8001
   recordSig: ""
   seqNum: 0
+
+authUDP:
+  enabled: false
+  port: 8001
 
 monlog:
   enable: false
