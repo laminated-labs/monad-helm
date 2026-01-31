@@ -30,11 +30,31 @@ function clear_artifacts() {
   then
     echo "$(date -Iseconds) New files detected. Proceeding to delete old artifacts."
 
-    find /monad/forkpoint/ -type f -name "forkpoint.rlp.*" -mmin +${RETENTION_FORKPOINT} -delete 2>/dev/null
-    find /monad/forkpoint/ -type f -name "forkpoint.toml.*" -mmin +${RETENTION_FORKPOINT} -delete 2>/dev/null
-    find /monad/validators/ -type f -name "validators.toml.*" -mmin +${RETENTION_VALIDATORS} -delete 2>/dev/null
-    find /monad/ledger/headers -type f -mmin +${RETENTION_LEDGER} -delete 2>/dev/null
-    find /monad/ledger/bodies -type f -mmin +${RETENTION_LEDGER} -delete 2>/dev/null
+    if [ -d /monad/forkpoint ]
+    then
+        echo "$(date -Iseconds) clearing forkpoints"
+        find /monad/forkpoint/ -type f -name "forkpoint.rlp.*" -mmin +${RETENTION_FORKPOINT} -delete 2>/dev/null
+        find /monad/forkpoint/ -type f -name "forkpoint.toml.*" -mmin +${RETENTION_FORKPOINT} -delete 2>/dev/null
+    fi
+
+    if [ -d /monad/validators ]
+    then
+        echo "$(date -Iseconds) clearing validators"
+        find /monad/validators/ -type f -name "validators.toml.*" -mmin +${RETENTION_VALIDATORS} -delete 2>/dev/null
+    fi
+
+    if [ -d /monad/ledger/headers ]
+    then
+        echo "$(date -Iseconds) clearing ledger headers"
+        find /monad/ledger/headers -type f -mmin +${RETENTION_LEDGER} -delete 2>/dev/null
+    fi
+
+    if [ -d /monad/ledger/bodies ]
+    then
+        echo "$(date -Iseconds) clearing ledger bodies"
+        find /monad/ledger/bodies -type f -mmin +${RETENTION_LEDGER} -delete 2>/dev/null
+    fi
+
     find /monad/ -type f -name "wal_*" -mmin +${RETENTION_WAL} -delete 2>/dev/null
 
     echo "$(date -Iseconds) Cleanup completed successfully"
