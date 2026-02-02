@@ -83,12 +83,13 @@ peers = []
 
 [statesync]
 expand_to_group = true
-init_peers = []
-
+{{- if .Values.node.peers }}
 {{- range .Values.node.peers }}
-
 [[statesync.init_peers]]
 secp256k1_pubkey = {{ . | quote }}
+{{- end }}
+{{- else }}
+init_peers = []
 {{- end }}
 
 {{- range $networkValues.bootstrapPeers }}
