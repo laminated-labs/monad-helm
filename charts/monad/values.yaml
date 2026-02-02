@@ -34,9 +34,36 @@ node:
     enabled: true
     url: 'https://d1v5yevi7k4blc.cloudfront.net'
   terminationGracePeriodSeconds: 30
-  address: ""
-  recordSig: ""
-  seqNum: 0
+  peerDiscovery:
+    address: ""
+    recordSig: ""
+    seqNum: 0
+    refreshPeriod: 20
+    requestTimeout: 5
+    unresponsivePruneThreshold: 3
+    lastParticipationPruneThreshold: 1000
+    minNumPeers: 150
+    maxNumPeers: 350
+    pingRateLimitPerSecond: 100
+  fullnodeRaptorcast:
+    deadlineRoundDist: 10
+    enableClient: true
+    enablePublisher: true
+    initEmptyRoundSpan: 23
+    inviteAcceptHeartbeatMs: 10000
+    inviteFutureDistMax: 600
+    inviteFutureDistMin: 1
+    inviteLookahead: 20
+    maxGroupSize: 150
+    maxInviteWait: 10
+    maxNumGroup: 3
+    raptor10FullnodeRedundancyFactor: 3.0
+    roundSpan: 240
+  networkConfig:
+    bindAddressHost: "0.0.0.0"
+    bindAddressPort: 8000
+    maxRttMs: 300
+    maxMbps: 1000
 
 authUDP:
   enabled: false
@@ -178,90 +205,68 @@ monitoring:
 
 testnet:
   chainId: 10143
-  initPeers:
-    - 02d84a0236ed911c8425dd78951ebbbbdfa7628781274b8db4423c67f65944102e
-    - 0319bb3b694487c34ce350254e12462787e15ec9116efc1a905a0a9e4e180235bd
-    - 02e5e6f1b70575c697e4e0a1d498d0f6206b5fcb9afe233a9fda90c700f6ad8d7e
-    - 034c5dab059a4eb65136e739470869d561ecfd00af41acafce6b064d9bc9a1d1b6
-    - 02645311ba0b9d4a55e36bb97abeaf944a7078c30b65caf19746b28a0ac2da22af
-    - 036d09f684b77ae83c70cd1afe082aec114bfbf2732db7f0902c987862a2e4cc7b
-    - 02cf1fa720a3887a7a6ba423874058c1e64b9dc54c57e6ee3d604d4563f945ee8e
-    - 039a9eedcd27e0fcc74f454b346bfaff807ac9ee6f88fc0a5ecf00ecc9eb006431
   bootstrapPeers:
     - address: "64.31.54.6:8000"
-      recordSeqNum: 0
-      nameRecordSig: "3b9d7bb0395a93336a48bb0c2e410c50e777f4d88eb114bf925d580cd55431bc780d43fd75a46154d8105412480b25f350e4ceffea7a17ea42b351ba8374741500"
-      pubkey: "02d84a0236ed911c8425dd78951ebbbbdfa7628781274b8db4423c67f65944102e"
+      recordSeqNum: 1
+      nameRecordSig: "0x930027c1bf5e254624c330c84c600bb84323f8491aae398de22bf077bd3883761ba56c4564a683ce211bac92c8294fdc460470a0db8172839fc53e3f5247762301"
+      pubkey: "0x02d84a0236ed911c8425dd78951ebbbbdfa7628781274b8db4423c67f65944102e"
+      authPort: 8001
     - address: "64.31.29.227:8000"
-      recordSeqNum: 0
-      nameRecordSig: "c8d537fde7ff3a713c0f5f82841a55910dfd784252f4c92a931e3ae67c4c6bcc08d53a9acd155f4591fd3011ef15da7264520a46809d03c3992c53ddca84208200"
-      pubkey: "0319bb3b694487c34ce350254e12462787e15ec9116efc1a905a0a9e4e180235bd"
-    - address: "188.214.131.19:8000"
-      recordSeqNum: 0
-      nameRecordSig: "75be548f996f85d733b322ffb92d4fba9dbc2bffe0c8ac7440a83652bedc9f93084f2c0121727ba8b9157ff5f4aea74092e1ec00fad5f9c9846f12a3b892f4d500"
-      pubkey: "02e5e6f1b70575c697e4e0a1d498d0f6206b5fcb9afe233a9fda90c700f6ad8d7e"
-    - address: "64.31.27.239:8000"
-      recordSeqNum: 0
-      nameRecordSig: "66bdf860b833b65f92b5376f197b513775fc832f5dc8cd00278ad6c74dca19865e537d0796f3dd67f717bf26468b11b9aefb41279fe326a7c5b19d56324a416801"
-      pubkey: "034c5dab059a4eb65136e739470869d561ecfd00af41acafce6b064d9bc9a1d1b6"
-    - address: "64.31.18.153:8000"
-      recordSeqNum: 0
-      nameRecordSig: "792235c5b66bcfab0165e821eca86319662cc5f2f941f92468767ee419df3c7e06f4ecba66826174d4f218d8719ef8c5141bbe5a3909c5a5e0e05e0b101aa1b400"
-      pubkey: "02645311ba0b9d4a55e36bb97abeaf944a7078c30b65caf19746b28a0ac2da22af"
-    - address: "64.130.56.117:8000"
-      recordSeqNum: 0
-      nameRecordSig: "7af3c226e710ab938f3a696d228bb9c6a45195771730e8cd7e1d8a471999fe7168371e50783f318d6febd9ab96daee69a0199533f42227b6d889398f8228af6501"
-      pubkey: "036d09f684b77ae83c70cd1afe082aec114bfbf2732db7f0902c987862a2e4cc7b"
+      recordSeqNum: 1
+      nameRecordSig: "0xf2bd1599b438be55e211342072fcd29a4584bfa5e1629b1d9bddb20b2cfe839468266808e66b55151c1680eff7df95d8b7a676028af54aaf1875ffe8a409e75e00"
+      pubkey: "0x0319bb3b694487c34ce350254e12462787e15ec9116efc1a905a0a9e4e180235bd"
+      authPort: 8001
     - address: "185.189.44.231:8000"
-      recordSeqNum: 0
-      nameRecordSig: "da63874881cc1b89b234303acf6c737ef3d5948b34a72b74acbdf77ccbba710e7b4e77128ab2c5e90d5396cea786b23f732af52c742b95d90b19652c91c9700501"
-      pubkey: "02cf1fa720a3887a7a6ba423874058c1e64b9dc54c57e6ee3d604d4563f945ee8e"
+      recordSeqNum: 1
+      nameRecordSig: "0x27da01f515ffa4f186d396736bec49d310f83550271f0f005c78d48946e2649220696676917e32e3747d89559cb070e47a94613a96c1bc390cb46ab16a2b122200"
+      pubkey: "0x03816049f25776260594160053555a14bc2b802c3cb04df4e557d107dbfa834541"
+      authPort: 8001
     - address: "185.150.190.139:8000"
-      recordSeqNum: 0
-      nameRecordSig: "fb924c12d4c95d9e0ab93d1241eabb834e1a3b4f6fe2c8c9ce31924ee253b9a23b352f8b5cfe4287f13d04f79c2ed2195177f555df1d5583800480df03ce903c01"
-      pubkey: "039a9eedcd27e0fcc74f454b346bfaff807ac9ee6f88fc0a5ecf00ecc9eb006431"
+      recordSeqNum: 1
+      nameRecordSig: "0xa6fee099bfc8598a11cfafae9256dec8a143fd95fa94114c524ca0a8763af09529bb905d92d7cb88327e756db0eadfb6ebdab51c2b146e688a5d25aa6073d1fe00"
+      pubkey: "0x03e72965cd3710d7bdde238fe24d36565b363632edccc22bf16dee2bcf16180475"
+      authPort: 8001
 
 mainnet:
   chainId: 143
-  initPeers:
-    - 037d1cbb43ffc35b540f5175cf366f5f5b5ee1c578ce493e5f689856da148f1cba
-    - 02b74a25df4a04bf3fda28a8460946e1cc097adfe0f3851a67546ca328a052020e
-    - 039bed2d57eb4140967b3a114594f046252fd781dba383d8ebcafac1988b7908f0
-    - 02a7dd4717c55010da5b49fde4515dd1932e138c3b34360d34a9e112e5269eefca
-    - 0267695371b9a65a2f3ad8324e15f09be7322c1678e5ae36aca277d4eb85a2c5ed
-    - 024ed4df9c6b174ec5eaf9b1d937cf9ce69581aacfd0581f54793b3c13db69757d
-    - 03f9e716c905b1d18ef97ada135799bd885b8c4bf24b01acc9964564cdee898527
-    - 032760f4b5ce58fd6d4c952a1bfcd44bf315a2a178614700ed9e95cd42bbdb1bf6
   bootstrapPeers:
     - address: "64.31.29.190:8000"
-      recordSeqNum: 0
-      nameRecordSig: "b6d059ef48caac2aa3041c772dc0ec1a9257777ffd092bc9f09a3799d016decf52978e68d004907bf37675a87962521e2f1b849a950ef5d77b21d5616f5f078800"
+      recordSeqNum: 1
+      nameRecordSig: "1d1cdf398a82fd294e1baa4d179b6b0d0f0489207ab1601b26a806b9468859b92f1397cb7b577ba39c27a7c7ffd2ccc8630d5b5c2aa4095d0fb0090d9fda78ee01"
       pubkey: "037d1cbb43ffc35b540f5175cf366f5f5b5ee1c578ce493e5f689856da148f1cba"
+      authPort: 8001
     - address: "64.31.53.173:8000"
-      recordSeqNum: 0
-      nameRecordSig: "4fabe57037e753b0d07fab771ba163d3f31991c99682a4d39cdbc9f317abc0ff1e5a5363bf620b03e081f70c1235667b9225a3ae816a677de6a5837f0600155c00"
+      recordSeqNum: 1
+      nameRecordSig: "00e2cbbfd5b9f28ffc8417ed10f02ba2910b07157daae37b19740c66fe7e87535f00418c97534a69caad9b100e2b562a8f119c11debd3eb787433b82378b6d4100"
       pubkey: "02b74a25df4a04bf3fda28a8460946e1cc097adfe0f3851a67546ca328a052020e"
+      authPort: 8001
     - address: "208.115.197.25:8000"
-      recordSeqNum: 0
-      nameRecordSig: "d7a36bad541a8de3fd283d153854ad3925950855349ccfa7a26d063fcd23492f26ea21a8f984fe76ca5c2ba01ff968f89696379512ef5ba1554b65ef24036f2201"
+      recordSeqNum: 1
+      nameRecordSig: "4d22a214e9fdab1e8ba0b684597c3db1e0fd5e369e148f83fea88af24b7dfca75c82293758aba386e69fa3d538a54c2147e7619d931806bf1a073742bb0a3a9300"
       pubkey: "039bed2d57eb4140967b3a114594f046252fd781dba383d8ebcafac1988b7908f0"
+      authPort: 8001
     - address: "64.130.52.235:8000"
-      recordSeqNum: 0
-      nameRecordSig: "257aa33045a866840a0d766ae3601cf807ca31a197ea3a1bfbcbfc76958860fa146239b60739928377bfc2ec279a84eff620e72bdac984a81c4a4cc9e2ecafa200"
+      recordSeqNum: 1
+      nameRecordSig: "d4edc830f19f1e087989f65e02b306424847b5cd34b85b51834df5556d6018396941fdf86b6a8fb5ba80f9b15d880a3ac93bbcee09e698727284d58ccebb1c1500"
       pubkey: "02a7dd4717c55010da5b49fde4515dd1932e138c3b34360d34a9e112e5269eefca"
+      authPort: 8001
     - address: "64.130.56.50:8000"
-      recordSeqNum: 0
-      nameRecordSig: "6c556b2b80e1623063aea46b47b502268faa3b722de376e3325961a21acc6739113ee23273322e5c9b0c2d3f746514f6d46250f373b9f5acb483c9f6763ac81f01"
+      recordSeqNum: 1
+      nameRecordSig: "7a14e16076ec7013fab5d2e287793eb8a2b0309d5cb636472bf134a7c333368520cec2eaafc6e0a3c7a5f146dc6ac0e3942fd4a4a77af7dc61fc4c097513d23301"
       pubkey: "0267695371b9a65a2f3ad8324e15f09be7322c1678e5ae36aca277d4eb85a2c5ed"
+      authPort: 8001
     - address: "64.130.49.148:8000"
-      recordSeqNum: 0
-      nameRecordSig: "8d99cbc2731db8378cd7907ac7be7dd215af1416044a2a5cfc4551b043f4e0574e29de32cfc1004f1dc7f7ece5d6d83d335edb3ae5ea4ff56c887a0e03b9d67a00"
+      recordSeqNum: 1
+      nameRecordSig: "4d9bc60e5b82da690946e00fbf42c5414fcd28e0796195f55376ec9b296c9f486c5c54f3ea4be6b10a7a3a9f14d763b75bcb36bd992393b2974b3a16576bb05f00"
       pubkey: "024ed4df9c6b174ec5eaf9b1d937cf9ce69581aacfd0581f54793b3c13db69757d"
+      authPort: 8001
     - address: "69.162.93.53:8000"
-      recordSeqNum: 0
-      nameRecordSig: "8cac5dbe1703645b9c0136e199fd382387e86e4b6b4d12295c57dd36e51be4985091c92d661e5d4ad935edc23c5f77ee9a653b3002a1501705ab9c43b9f73aef00"
+      recordSeqNum: 1
+      nameRecordSig: "6fa31238fd234196338693890c73f91bc893b009cf4c84f40c05d24c62a4c1e2617ef5b6b90c897b356c7d2207a58dc2b1fb2f1d8b787b2f4b4154fe606ef0bd00"
       pubkey: "03f9e716c905b1d18ef97ada135799bd885b8c4bf24b01acc9964564cdee898527"
+      authPort: 8001
     - address: "185.189.46.19:8000"
-      recordSeqNum: 0
-      nameRecordSig: "a32840063f51dde1fbaaef8c12e0f963d873a081c21d33d6c86275a91877f97516e51e8e98aba423f0b699f2968f68aef250b3cf9a7f34f9e63a770ebfb8db3c01"
+      recordSeqNum: 1
+      nameRecordSig: "28198a163a8f6e89bb0b709bfef91f4e4d4d0de86e0c3bd069ea6cb4098b45bd099d3654a135b982906ed8897ed3778f14febf3ec88deee1f30d777fb8f2cba801"
       pubkey: "032760f4b5ce58fd6d4c952a1bfcd44bf315a2a178614700ed9e95cd42bbdb1bf6"
+      authPort: 8001
