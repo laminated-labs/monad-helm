@@ -9,7 +9,7 @@ spec:
       {{- include "monad.selectorLabels" . | nindent 6 }}
   podMetricsEndpoints:
     - port: metrics
-    {{- range .Values.monitoring.ports }}
-    - port: {{ . }}
-    {{- end}}
+    {{- with .Values.monitoring.endpoints }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}
