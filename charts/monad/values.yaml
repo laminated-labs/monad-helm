@@ -200,8 +200,8 @@ extraObjects: []
 
 # Configuration for monitoring
 monitoring:
-  enabled: false
-  ports: []
+  enabled: true
+  endpoints: []
 
 testnet:
   chainId: 10143
